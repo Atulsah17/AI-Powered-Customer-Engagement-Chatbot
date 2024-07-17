@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wine Business Chatbot</title>
+    <link rel="stylesheet" href="static\styles.css">
+</head>
+<body>
+    <div class="chat-container">
+        <div id="chat-box" class="chat-box">
+            <div class="chat-message bot-message">Welcome! How can I help you?</div>
+        </div>
+        <input type="text" id="user-input" placeholder="Type your message...">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+        function sendMessage() {
+            var userInput = document.getElementById("user-input").value.trim();
+            if (userInput === "") return;
+
+            appendUserMessage(userInput);
+
+            fetch('/ask', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message: userInput })
+            })
+            .then(response => response.json())
+            .then(data => {
+                appendBotMessage(data.message);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                appendBotMessage("Sorry, something went wrong. Please try again later.");
+            });
+
+            document.getElementById("user-input").value = "";
+        }
+
+        function appendUserMessage(message) {
+            var chatBox = document.getElementById("chat-box");
+            var userMessage = document.createElement("div");
+            userMessage.className = "chat-message user-message";
+            userMessage.textContent = message;
+            chatBox.appendChild(userMessage);
+        }
+
+        function appendBotMessage(message) {
+            var chatBox = document.getElementById("chat-box");
+            var botMessage = document.createElement("div");
+            botMessage.className = "chat-message bot-message";
+            botMessage.textContent = message;
+            chatBox.appendChild(botMessage);
+        }
+    </script>
+</body>
+</html>
